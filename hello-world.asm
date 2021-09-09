@@ -1,5 +1,9 @@
-PORTB = $6000
-PORTA = $6001
+; RAM: 0x0000 - 0x3fff
+; VIA: 0x6000 - 0x7fff
+; ROM: 0x8000 - 0xffff
+
+PORTB = $6000 ; LCD Data
+PORTA = $6001 ; LCD Instructions
 DDRB = $6002
 DDRA = $6003
 
@@ -27,36 +31,42 @@ reset:
   lda #$00000001 ; Clear display
   jsr lcd_instruction
 
-  lda #"H"
+  ldx #0
+print:
+  lda message,x
+  beq loop
   jsr print_char
-  lda #"e"
-  jsr print_char
-  lda #"l"
-  jsr print_char
-  lda #"l"
-  jsr print_char
-  lda #"o"
-  jsr print_char
-  lda #" "
-  jsr print_char
-  lda #"w"
-  jsr print_char
-  lda #"o"
-  jsr print_char
-  lda #"r"
-  jsr print_char
-  lda #"l"
-  jsr print_char
-  lda #"d"
-  jsr print_char
-  lda #"!"
-  jsr print_char
+  inx
+  jmp print
 
 loop:
   jmp loop
 
+message: .asciiz "   Learn more                           eater.net/6502"
+
+lcd_wait:
+  pha
+  lda #%00000000 ; Port B is input
+  sta DDRB
+lcdbusy:
+  lda #RW
+  sta PORTA
+  lda #(RW | E)
+  sta PORTA
+  lda PORTB
+  and #%10000000
+  bne lcdbusy
+
+  lda #RW ; WHYY?
+  sta PORTA
+  lda #%11111111 ; Port B is output
+  sta DDRB
+  pla
+  rts
+
 lcd_instruction:
-  sta PORTB
+  jsr lcd_wait
+  sta PORTB      ; Send LCD data
   lda #0         ; Clear RS/RW/E bits
   sta PORTA
   lda #E         ; Set E bit to send instruction
@@ -66,6 +76,7 @@ lcd_instruction:
   rts
 
 print_char:
+  jsr lcd_wait
   sta PORTB
   lda #RS        ; Set RS; Clear RW/E bits
   sta PORTA
