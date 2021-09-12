@@ -9,6 +9,7 @@ These are the project files for my version of [Ben Eater's 6502 computer](https:
 
 ## Future plans
 
+- What to do with other switches
 - Interrupt doesn't print decimals beyond 9
 - Turn into a PCB
 - Change LCD interface from 8 pins to 4
