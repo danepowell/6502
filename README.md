@@ -9,13 +9,15 @@ These are the project files for my version of [Ben Eater's 6502 computer](https:
 
 ## Future plans
 
+- Change interrupt behavior to reduce lag
 - What to do with other switches
 - Interrupt doesn't print decimals beyond 9
-- Turn into a PCB
+- Turn into a PCB: https://www.reddit.com/r/beneater/comments/dgcpt3/i_made_a_pcb_version_of_ben_eaters_6502_computer/
 - Change LCD interface from 8 pins to 4
 - Automatic power-on reset
-- Bootloader or something to avoid having to pop and flash the EEPROM for every change
-- Run actual-ish 80s era software??
+- Emulator: starting in PHP, or https://www.reddit.com/r/beneater/comments/phn3sd/started_work_on_an_emulator_for_my_6502_tms9918/
+- Bootloader or something to avoid having to pop and flash the EEPROM for every change: https://github.com/janroesner/sixty5o2
+- Space Invaders: https://www.reddit.com/r/beneater/comments/phn3sd/started_work_on_an_emulator_for_my_6502_tms9918/
 
 ## Resources / credits
 
