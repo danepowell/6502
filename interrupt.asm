@@ -79,6 +79,17 @@ divloop:
   rol mod10
   rol mod10 + 1
 
+  ; a,y = dividend - divisor
+  sec
+  lda mod10
+  sbc #10
+  tay ; save low byte in Y
+  lda mod10 + 1
+  sbc #0
+  bcc ignore_result ; branch if dividend < advisor
+  sty mod10
+  sta mod10 + 1
+
 ignore_result:
   dex
   bne divloop

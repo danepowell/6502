@@ -11,7 +11,7 @@ These are the project files for my version of [Ben Eater's 6502 computer](https:
 
 - Change interrupt behavior to reduce lag
 - What to do with other switches
-- Interrupt doesn't print decimals beyond 9
+- Fix flickering in interrupt script
 - Turn into a PCB: https://www.reddit.com/r/beneater/comments/dgcpt3/i_made_a_pcb_version_of_ben_eaters_6502_computer/
 - Change LCD interface from 8 pins to 4
 - Automatic power-on reset
