@@ -1,4 +1,4 @@
-# 6502 computer
+# DP6502 computer
 
 These are the project files for my version of [Ben Eater's 6502 computer](https://eater.net/6502).
 
