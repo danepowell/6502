@@ -9,13 +9,13 @@ These are the project files for my version of [Ben Eater's 6502 computer](https:
 
 ## Future plans
 
-- Automatic power-on reset
-- Bootloader or something to avoid having to pop and flash the EEPROM for every change: https://github.com/janroesner/sixty5o2
 - Change LCD interface from 8 pins to 4
+- Automatic power-on reset ([schematics](https://www.grappendorf.net/projects/6502-home-computer/reset-circuit.html))
+- Bootloader or something to avoid having to pop and flash the EEPROM for every change ([source](https://github.com/janroesner/sixty5o2))
 - What to do with other switches
-- Turn into a PCB: https://www.reddit.com/r/beneater/comments/dgcpt3/i_made_a_pcb_version_of_ben_eaters_6502_computer/
-- Emulator: starting in PHP, or https://www.reddit.com/r/beneater/comments/phn3sd/started_work_on_an_emulator_for_my_6502_tms9918/
-- Space Invaders: https://www.reddit.com/r/beneater/comments/phn3sd/started_work_on_an_emulator_for_my_6502_tms9918/
+- [Turn into a PCB](https://www.reddit.com/r/beneater/comments/dgcpt3/i_made_a_pcb_version_of_ben_eaters_6502_computer/)
+- Emulator: starting in PHP, or [following example](https://www.reddit.com/r/beneater/comments/phn3sd/started_work_on_an_emulator_for_my_6502_tms9918/)
+- Space Invaders ([source code](https://github.com/visrealm/hbc-56/tree/master/code/6502/invaders))
 
 ## Resources / credits
 
