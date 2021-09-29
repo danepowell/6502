@@ -1,0 +1,14 @@
+#!/usr/bin/env php
+<?php
+namespace Danepowell\dp6502;
+
+use Danepowell\dp6502\DataBus;
+use Danepowell\dp6502\MPU;
+use Danepowell\dp6502\ROM;
+
+require dirname(__DIR__).'/vendor/autoload.php';
+$rom = new ROM($argv[1]);
+$dataBus = new DataBus($rom);
+$mpu = new MPU($dataBus);
+
+$mpu->reset();

@@ -1,0 +1,26 @@
+{
+    "name": "danepowell/dp6502",
+    "description": "Emulator for 6502 MPU and associated hardware",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Danepowell\\dp6502\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Dane Powell",
+            "email": "git@danepowell.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "acquia/coding-standards": "^0.7.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1"
+    },
+    "extra": {
+        "phpcodesniffer-search-depth": "4"
+    }
+}
