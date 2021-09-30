@@ -3,10 +3,10 @@
 namespace Danepowell\dp6502;
 
 /**
- * Byte (8-bit) data type.
+ * Address (16-bit) data type.
  */
-class Byte extends Bits {
+class Address extends Bits {
   protected function length(): int {
-    return 8;
+    return 16;
   }
 }

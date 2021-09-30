@@ -13,8 +13,8 @@ class ROM {
     $this->program = array_values(unpack('C*', file_get_contents($rom_file)));
   }
 
-  public function read(int $address): Byte {
-    return new Byte($this->program[$address]);
+  public function read(Address $address): Byte {
+    return new Byte($this->program[$address->int()]);
   }
 
 }
