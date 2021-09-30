@@ -13,8 +13,9 @@ class ROM {
     $this->program = array_values(unpack('C*', file_get_contents($rom_file)));
   }
 
-  public function read(Address $address): Byte {
-    return new Byte($this->program[$address->int()]);
+  public function read($address): int {
+    Util::validateAddress($address);
+    return $this->program[$address];
   }
 
 }
