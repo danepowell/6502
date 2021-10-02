@@ -8,7 +8,8 @@ use Danepowell\dp6502\ROM;
 
 require dirname(__DIR__).'/vendor/autoload.php';
 $rom = new ROM($argv[1]);
-$dataBus = new DataBus($rom);
+$ram = new RAM();
+$dataBus = new DataBus($rom, $ram);
 $mpu = new MPU($dataBus);
 
 $mpu->reset();

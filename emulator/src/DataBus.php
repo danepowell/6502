@@ -10,16 +10,18 @@ use Exception;
 class DataBus {
 
   private ROM $rom;
+  private RAM $ram;
 
-  public function __construct(ROM $rom) {
+  public function __construct(ROM $rom, RAM $ram) {
     $this->rom = $rom;
+    $this->ram = $ram;
   }
 
   public function read(int $address): int {
     Util::validateAddress($address);
     // RAM
     if ($address >= 0 && $address <= 0x3fff) {
-      throw new Exception("RAM not yet defined (address $address)");
+      return $this->ram->read($address);
     }
 
     // VIA

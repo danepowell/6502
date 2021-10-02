@@ -22,7 +22,7 @@ class Util {
   }
 
   private static function decHex(int $bits, int $length): string {
-    return str_pad(dechex($bits), $length, '0');
+    return str_pad(dechex($bits), $length, '0', STR_PAD_LEFT);
   }
 
   private static function validateBitString(int $bits, $length): void {

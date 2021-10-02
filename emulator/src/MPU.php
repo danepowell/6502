@@ -38,12 +38,15 @@ class MPU {
           $this->regA = $this->read();
           break;
         case 0x8d:
-          //$this->write($this->regA, );
+          $address = $this->read();
+          $this->write($address, $this->regA);
+          break;
+        case 0x20:
+          $this->regPC = $this->read();
           break;
         default:
           throw new \Exception('Unknown OpCode ' . Util::byteHex($opCode));
       }
-      $this->regPC++;
     }
     while (TRUE);
   }
@@ -55,10 +58,9 @@ class MPU {
     return $data;
   }
 
-  private function write(int $data, $address): void {
-    $this->dataBus->write($data, $address);
+  private function write(int $address, int $data): void {
+    $this->dataBus->write($address, $data);
     echo 'Wrote ' . Util::byteHex($data) . ' to ' . Util::addressHex($address) . "\n";
-    $this->regPC++;
   }
 
 }
