@@ -12,4 +12,9 @@ $ram = new RAM();
 $dataBus = new DataBus($rom, $ram);
 $mpu = new MPU($dataBus);
 
-$mpu->reset();
+try {
+  $mpu->reset();
+}
+catch (\Exception $exception) {
+  echo 'Program execution error: ' . $exception->getMessage() . "\n";
+}
