@@ -23,31 +23,42 @@ class MPU {
 
   public function reset(): void {
     // Get the reset vector.
-    $vectorLo = $this->dataBus->read(0xfffc);
-    $vectorHi = $this->dataBus->read(0xfffd);
+    $this->regPC = 0xfffc;
+    $vectorLo = $this->read();
+    $vectorHi = $this->read();
     $this->regPC = $vectorHi * 256 + $vectorLo;
     $this->loop();
   }
 
   public function loop(): void {
     do {
-      $opCode = $this->dataBus->read($this->regPC);
+      $opCode = $this->read();
       switch ($opCode) {
         case 0xa9:
-          // @todo add debug logging via env var that prints just like serial monitor.
-          $this->regPC++;
-          $this->regA = $this->dataBus->read($this->regPC);
+          $this->regA = $this->read();
           break;
         case 0x8d:
-          $this->regPC++;
-          // @todo write to data bus.
+          //$this->write($this->regA, );
           break;
         default:
-          throw new \Exception("Unknown OpCode $opCode");
+          throw new \Exception('Unknown OpCode ' . Util::byteHex($opCode));
       }
       $this->regPC++;
     }
     while (TRUE);
+  }
+
+  private function read(): int {
+    $data = $this->dataBus->read($this->regPC);
+    echo 'Read ' . Util::byteHex($data) . ' from ' . Util::addressHex($this->regPC) . "\n";
+    $this->regPC++;
+    return $data;
+  }
+
+  private function write(int $data, $address): void {
+    $this->dataBus->write($data, $address);
+    echo 'Wrote ' . Util::byteHex($data) . ' to ' . Util::addressHex($address) . "\n";
+    $this->regPC++;
   }
 
 }
