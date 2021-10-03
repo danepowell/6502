@@ -12,12 +12,6 @@ class MPU {
   // Program counter (PC) register.
   private int $regPC;
 
-  // Instruction (opcode) register.
-  private int $regOp;
-
-  // Temporary address register for first operand.
-  private int $regAd;
-
   // Registers A,X,Y.
   private int $regA;
   private int $regX;
@@ -28,50 +22,37 @@ class MPU {
   }
 
   public function reset(): void {
-    // Clear registers.
-    $this->regOp = 0;
-    $this->regAd = 0;
-    $this->regPC = 0;
-    $this->regA = $this->regX = $this->regY = 0;
-
     // Get the reset vector.
     $this->regPC = 0xfffc;
     $vectorLo = $this->read();
     $vectorHi = $this->read();
     $this->regPC = $vectorHi * 256 + $vectorLo;
+    $this->loop();
   }
 
-  public function tock(): void {
-      if (!$this->regOp) {
-        $this->regOp = $this->read();
-        return;
-      }
-
-      switch ($this->regOp) {
+  public function loop(): void {
+    do {
+      $opCode = $this->read();
+      switch ($opCode) {
         // lda
         case 0xa9:
           $this->regA = $this->read();
-          $this->regOp = 0;
-          return;
+          break;
         // sta
         case 0x8d:
-          if (!$this->regAd) {
-            $this->regAd = $this->read();
-            return;
-          }
+          $addressLo = $this->read();
           $addressHi = $this->read();
-          $this->write($addressHi * 256 + $this->regAd, $this->regA);
-          $this->regOp = 0;
-          $this->regAd = 0;
-          return;
+          $this->write($addressHi * 256 + $addressLo, $this->regA);
+          break;
         // jsr
         case 0x20:
           $this->regPC = $this->read();
-          $this->regOp = 0;
           break;
         default:
-          throw new \Exception('Unknown OpCode ' . Util::byteHex($this->regOp));
+          throw new \Exception('Unknown OpCode ' . Util::byteHex($opCode));
       }
+    }
+    while (TRUE);
   }
 
   private function read(): int {

@@ -2,22 +2,19 @@
 <?php
 namespace Danepowell\dp6502;
 
+use Danepowell\dp6502\DataBus;
+use Danepowell\dp6502\MPU;
+use Danepowell\dp6502\ROM;
+
 require dirname(__DIR__).'/vendor/autoload.php';
 $rom = new ROM($argv[1]);
 $ram = new RAM();
 $dataBus = new DataBus($rom, $ram);
 $mpu = new MPU($dataBus);
-$clock = new Clock(0.00001);
 
-$mpu->reset();
-do {
-  $clock->tick();
-  try {
-    $mpu->tock();
-  }
-  catch (\Exception $exception) {
-    echo 'Program execution error: ' . $exception->getMessage() . "\n";
-  }
+try {
+  $mpu->reset();
 }
-while (TRUE);
-
+catch (\Exception $exception) {
+  echo 'Program execution error: ' . $exception->getMessage() . "\n";
+}
