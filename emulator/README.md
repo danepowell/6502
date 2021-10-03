@@ -2,6 +2,8 @@
 
 This is a PHP-based emulator for my version of [Ben Eater’s 6502](https://eater.net/6502) computer.
 
+I’m modeling the 6502 at the level of individual instructions. I’ve flirted with modeling at a more granular level (i.e. individual clock cycles) but this turns out to be difficult due to idiosyncracies (or clever optimizations, really) of the 6502, such that there’s no clear mapping between instructions and clock cycles. For instance, [this post](http://forum.6502.org/viewtopic.php?p=9466&sid=5f0d5a945d7d41c2f5e49df12fd5da83#p9466) describes the internal logic associated with the LDA instruction: it takes essentially 4.5 clock cycles, and the cycles are tightly coupled not only to each other but also to the instructions running before and after LDA.
+
 ## Why write an emulator from scratch?
 
 For the lulz and just to see if I can. I didn’t say it would be any good. I’m not using any existing emulators as reference, [clean-room](https://en.wikipedia.org/wiki/Clean_room_design) design is more challenging and therefore more fun.
