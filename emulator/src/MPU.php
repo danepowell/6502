@@ -11,7 +11,8 @@ class MPU {
   private static array $opMatrix = [
     0xa9 => 'lda',
     0x8d => 'sta',
-    0x20 => 'jsr',
+    0x6a => 'ror',
+    0x4c => 'jmp',
   ];
 
   // Program counter (PC) register.
@@ -40,7 +41,8 @@ class MPU {
    *
    * @uses lda()
    * @uses sta()
-   * @uses jsr()
+   * @uses ror()
+   * @uses jmp()
    * @throws \Exception
    */
   public function loop(): void {
@@ -65,7 +67,12 @@ class MPU {
     $this->write($addressHi * 256 + $addressLo, $this->regA);
   }
 
-  private function jsr(): void {
+  private function ror(): void {
+    $binary = decbin($this->regA);
+    $this->regA = bindec(substr($binary, -1).substr($binary, 0, -1));
+  }
+
+  private function jmp(): void {
     $this->regPC = $this->read();
   }
 
