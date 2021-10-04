@@ -8,6 +8,11 @@ namespace Danepowell\dp6502;
 class MPU {
 
   private DataBus $dataBus;
+  private static array $opMatrix = [
+    0xa9 => 'lda',
+    0x8d => 'sta',
+    0x20 => 'jsr',
+  ];
 
   // Program counter (PC) register.
   private int $regPC;
@@ -30,29 +35,38 @@ class MPU {
     $this->loop();
   }
 
+  /**
+   * Main program loop.
+   *
+   * @uses lda()
+   * @uses sta()
+   * @uses jsr()
+   * @throws \Exception
+   */
   public function loop(): void {
     do {
       $opCode = $this->read();
-      switch ($opCode) {
-        // lda
-        case 0xa9:
-          $this->regA = $this->read();
-          break;
-        // sta
-        case 0x8d:
-          $addressLo = $this->read();
-          $addressHi = $this->read();
-          $this->write($addressHi * 256 + $addressLo, $this->regA);
-          break;
-        // jsr
-        case 0x20:
-          $this->regPC = $this->read();
-          break;
-        default:
-          throw new \Exception('Unknown OpCode ' . Util::byteHex($opCode));
+      if (!array_key_exists($opCode, self::$opMatrix)) {
+        throw new \Exception('Unknown OpCode ' . Util::byteHex($opCode));
       }
+      $function = self::$opMatrix[$opCode];
+      $this->$function();
     }
     while (TRUE);
+  }
+
+  private function lda(): void {
+    $this->regA = $this->read();
+  }
+
+  private function sta(): void {
+    $addressLo = $this->read();
+    $addressHi = $this->read();
+    $this->write($addressHi * 256 + $addressLo, $this->regA);
+  }
+
+  private function jsr(): void {
+    $this->regPC = $this->read();
   }
 
   private function read(): int {
