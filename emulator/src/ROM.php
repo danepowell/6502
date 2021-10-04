@@ -5,7 +5,7 @@ namespace Danepowell\dp6502;
 /**
  * ROM.
  */
-class ROM {
+class ROM extends Chip {
 
   private array $program;
 
@@ -18,4 +18,15 @@ class ROM {
     return $this->program[$address];
   }
 
+  public function write(int $address, $data): void {
+    throw new \Exception("It's called _read-only_ for a reason, dummy");
+  }
+
+  public function addressStart(): int {
+    return 0x8000;
+  }
+
+  public function addressEnd(): int {
+    return 0xffff;
+  }
 }

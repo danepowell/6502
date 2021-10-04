@@ -9,53 +9,30 @@ use Exception;
  */
 class DataBus {
 
-  private ROM $rom;
-  private RAM $ram;
+  private array $chips;
 
-  public function __construct(ROM $rom, RAM $ram) {
-    $this->rom = $rom;
-    $this->ram = $ram;
+  public function __construct(array $chips) {
+    $this->chips = $chips;
   }
 
   public function read(int $address): int {
     Util::validateAddress($address);
-    // RAM
-    if ($address >= 0 && $address <= 0x3fff) {
-      return $this->ram->read($address);
-    }
-
-    // VIA
-    if ($address >= 0x6000 && $address <= 0x7fff) {
-      throw new Exception('VIA not yet defined');
-    }
-
-    // ROM
-    if ($address >= 0x8000 && $address <= 0xffff) {
-      // Highest order bit is dropped when addressing the ROM.
-      return $this->rom->read($address - 0x8000);
-    }
-
-    throw new Exception('Invalid address');
+    $chip = $this->selectChip($address);
+    return $chip->read($address - $chip->addressStart());
   }
 
   public function write(int $address, int $data): void {
     Util::validateAddress($address);
-    // RAM
-    if ($address >= 0 && $address <= 0x3fff) {
-      $this->ram->write($address, $data);
-      return;
-    }
+    $chip = $this->selectChip($address);
+    $chip->write($address - $chip->addressStart(), $data);
+  }
 
-    // VIA
-    if ($address >= 0x6000 && $address <= 0x7fff) {
-      throw new Exception('VIA not yet defined');
+  private function selectChip($address): Chip {
+    foreach ($this->chips as $chip) {
+      if ($address >= $chip->addressStart() && $address <= $chip->addressEnd()) {
+        return $chip;
+      }
     }
-
-    // ROM
-    if ($address >= 0x8000 && $address <= 0xffff) {
-      throw new Exception("It's called _read-only_ for a reason, dummy");
-    }
-
     throw new Exception('Address ' . Util::addressHex($address) . ' does not map to any device');
   }
 

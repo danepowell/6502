@@ -5,7 +5,7 @@ namespace Danepowell\dp6502;
 /**
  * RAM.
  */
-class RAM {
+class RAM extends Chip {
 
   private array $data;
 
@@ -18,6 +18,14 @@ class RAM {
     Util::validateAddress($address);
     Util::validateByte($data);
     $this->data[$address] = $data;
+  }
+
+  public function addressStart(): int {
+    return 0;
+  }
+
+  public function addressEnd(): int {
+    return 0x3fff;
   }
 
 }
