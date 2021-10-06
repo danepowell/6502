@@ -30,9 +30,7 @@ class MPU {
   public function reset(): void {
     // Get the reset vector.
     $this->regPC = 0xfffc;
-    $vectorLo = $this->read();
-    $vectorHi = $this->read();
-    $this->regPC = $vectorHi * 256 + $vectorLo;
+    $this->jmp();
     $this->loop();
   }
 
@@ -47,7 +45,7 @@ class MPU {
    */
   public function loop(): void {
     do {
-      $opCode = $this->read();
+      $opCode = $this->readByte();
       if (!array_key_exists($opCode, self::$opMatrix)) {
         throw new \Exception('Unknown OpCode ' . Util::byteHex($opCode));
       }
@@ -58,30 +56,35 @@ class MPU {
   }
 
   private function lda(): void {
-    $this->regA = $this->read();
+    $this->regA = $this->readByte();
   }
 
   private function sta(): void {
-    $addressLo = $this->read();
-    $addressHi = $this->read();
-    $this->write($addressHi * 256 + $addressLo, $this->regA);
+    $this->write($this->readAddress(), $this->regA);
   }
 
   private function ror(): void {
-    $binary = decbin($this->regA);
+    $binary = Util::decBin($this->regA, 8);
+    echo $binary . "\n";
     $this->regA = bindec(substr($binary, -1).substr($binary, 0, -1));
   }
 
   private function jmp(): void {
-    $this->regPC = $this->read();
+    $this->regPC = $this->readAddress();
   }
 
-  private function read(): int {
+  private function readByte(): int {
     echo 'Read ' . Util::addressHex($this->regPC) . ': ';
     $data = $this->dataBus->read($this->regPC);
     echo Util::byteHex($data) . "\n";
     $this->regPC++;
     return $data;
+  }
+
+  private function readAddress(): int {
+    $addressLo = $this->readByte();
+    $addressHi = $this->readByte();
+    return $addressHi * 256 + $addressLo;
   }
 
   private function write(int $address, int $data): void {

@@ -21,8 +21,12 @@ class Util {
     return self::decHex($bits, 2);
   }
 
-  private static function decHex(int $bits, int $length): string {
+  public static function decHex(int $bits, int $length): string {
     return str_pad(dechex($bits), $length, '0', STR_PAD_LEFT);
+  }
+
+  public static function decBin(int $bits, int $length): string {
+    return str_pad(decbin($bits), $length, '0', STR_PAD_LEFT);
   }
 
   private static function validateBitString(int $bits, $length): void {
