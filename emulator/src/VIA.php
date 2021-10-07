@@ -7,6 +7,11 @@ class VIA extends Chip {
   private array $data;
   private int $ddrb;
   private int $orb;
+  private LEDs $portb;
+
+  public function __construct($portb) {
+    $this->portb = $portb;
+  }
 
   public function write(int $address, int $data): void {
     Util::validateAddress($address);
@@ -14,6 +19,7 @@ class VIA extends Chip {
     switch ($address) {
       case 0:
         $this->orb = $data;
+        $this->portb->write($data);
         break;
       case 2:
         $this->ddrb = $data;

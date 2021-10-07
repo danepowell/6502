@@ -5,7 +5,8 @@ namespace Danepowell\dp6502;
 require dirname(__DIR__).'/vendor/autoload.php';
 $rom = new ROM($argv[1]);
 $ram = new RAM();
-$via = new VIA();
+$leds = new LEDs();
+$via = new VIA($leds);
 $dataBus = new DataBus([$rom, $ram, $via]);
 $mpu = new MPU($dataBus);
 
