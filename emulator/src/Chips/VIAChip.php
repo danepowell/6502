@@ -1,9 +1,12 @@
 <?php
 
 
-namespace Danepowell\dp6502;
+namespace Danepowell\dp6502\Chips;
 
-class VIA extends Chip {
+use Danepowell\dp6502\LEDs;
+use Danepowell\dp6502\Util;
+
+class VIAChip extends AbstractChip {
   private array $data;
   private int $ddrb;
   private int $orb;

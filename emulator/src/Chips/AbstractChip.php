@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Danepowell\dp6502;
+namespace Danepowell\dp6502\Chips;
 
 
-abstract class Chip {
+abstract class AbstractChip {
   abstract public function addressStart(): int;
   abstract public function addressEnd(): int;
   abstract public function read(int $address): int;

@@ -1,11 +1,13 @@
 <?php
 
-namespace Danepowell\dp6502;
+namespace Danepowell\dp6502\Chips;
+
+use Danepowell\dp6502\Util;
 
 /**
- * RAM.
+ * RAMChip.
  */
-class RAM extends Chip {
+class RAMChip extends AbstractChip {
 
   private array $data;
 

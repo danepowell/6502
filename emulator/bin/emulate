@@ -2,13 +2,18 @@
 <?php
 namespace Danepowell\dp6502;
 
+use Danepowell\dp6502\Chips\MPUChip;
+use Danepowell\dp6502\Chips\RAMChip;
+use Danepowell\dp6502\Chips\ROMChip;
+use Danepowell\dp6502\Chips\VIAChip;
+
 require dirname(__DIR__).'/vendor/autoload.php';
-$rom = new ROM($argv[1]);
-$ram = new RAM();
+$rom = new ROMChip($argv[1]);
+$ram = new RAMChip();
 $leds = new LEDs();
-$via = new VIA($leds);
+$via = new VIAChip($leds);
 $dataBus = new DataBus([$rom, $ram, $via]);
-$mpu = new MPU($dataBus);
+$mpu = new MPUChip($dataBus);
 
 try {
   $mpu->reset();

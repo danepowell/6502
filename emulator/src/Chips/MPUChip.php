@@ -1,11 +1,14 @@
 <?php
 
-namespace Danepowell\dp6502;
+namespace Danepowell\dp6502\Chips;
+
+use Danepowell\dp6502\DataBus;
+use Danepowell\dp6502\Util;
 
 /**
- * Emulate a 6502 MPU.
+ * Emulate a 6502 MPUChip.
  */
-class MPU {
+class MPUChip {
 
   private DataBus $dataBus;
   private static array $opMatrix = [

@@ -1,11 +1,13 @@
 <?php
 
-namespace Danepowell\dp6502;
+namespace Danepowell\dp6502\Chips;
+
+use Danepowell\dp6502\Util;
 
 /**
- * ROM.
+ * ROMChip.
  */
-class ROM extends Chip {
+class ROMChip extends AbstractChip {
 
   private array $program;
 

@@ -2,10 +2,11 @@
 
 namespace Danepowell\dp6502;
 
+use Danepowell\dp6502\Chips\AbstractChip;
 use Exception;
 
 /**
- * A data bus connecting MPU, ROM, and RAM.
+ * A data bus connecting MPUChip, ROMChip, and RAMChip.
  */
 class DataBus {
 
@@ -27,7 +28,7 @@ class DataBus {
     $chip->write($address - $chip->addressStart(), $data);
   }
 
-  private function selectChip($address): Chip {
+  private function selectChip($address): AbstractChip {
     foreach ($this->chips as $chip) {
       if ($address >= $chip->addressStart() && $address <= $chip->addressEnd()) {
         return $chip;
