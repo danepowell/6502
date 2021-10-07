@@ -65,7 +65,6 @@ class MPU {
 
   private function ror(): void {
     $binary = Util::decBin($this->regA, 8);
-    echo $binary . "\n";
     $this->regA = bindec(substr($binary, -1).substr($binary, 0, -1));
   }
 
@@ -74,9 +73,10 @@ class MPU {
   }
 
   private function readByte(): int {
-    echo 'Read ' . Util::addressHex($this->regPC) . ': ';
     $data = $this->dataBus->read($this->regPC);
-    echo Util::byteHex($data) . "\n";
+    if (getenv('DP6502_DEBUG')) {
+      echo 'Read ' . Util::addressHex($this->regPC) . ': ' . Util::byteHex($data) . "\n";
+    }
     $this->regPC++;
     return $data;
   }
@@ -88,7 +88,9 @@ class MPU {
   }
 
   private function write(int $address, int $data): void {
-    echo 'Write ' . Util::addressHex($address) . ': ' . Util::byteHex($data) . "\n";
+    if (getenv('DP6502_DEBUG')) {
+      echo 'Write ' . Util::addressHex($address) . ': ' . Util::byteHex($data) . "\n";
+    }
     try {
       $this->dataBus->write($address, $data);
     }
