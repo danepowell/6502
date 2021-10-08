@@ -20,7 +20,7 @@ class ROMChip extends AbstractChip {
     return $this->program[$address];
   }
 
-  public function write(int $address, $data): void {
+  public function write(int $address, int $data): void {
     throw new \Exception("It's called _read-only_ for a reason, dummy");
   }
 
