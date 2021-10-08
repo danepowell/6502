@@ -6,6 +6,7 @@ use Danepowell\dp6502\Chips\MPUChip;
 use Danepowell\dp6502\Chips\RAMChip;
 use Danepowell\dp6502\Chips\ROMChip;
 use Danepowell\dp6502\Chips\VIAChip;
+use Danepowell\dp6502\Outputs\LEDs;
 
 require dirname(__DIR__).'/vendor/autoload.php';
 $rom = new ROMChip($argv[1]);

@@ -3,7 +3,7 @@
 
 namespace Danepowell\dp6502\Chips;
 
-use Danepowell\dp6502\LEDs;
+use Danepowell\dp6502\Outputs\LEDs;
 use Danepowell\dp6502\Util;
 
 class VIAChip extends AbstractChip {
