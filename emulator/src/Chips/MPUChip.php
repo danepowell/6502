@@ -16,10 +16,17 @@ class MPUChip {
     0x8d => 'sta',
     0x6a => 'ror',
     0x4c => 'jmp',
+    0xa2 => 'ldx',
+    0x9a => 'txs',
+    0x20 => 'jsr',
+    0x48 => 'pha',
   ];
 
   // Program counter (PC) register.
   private int $regPC;
+
+  // Stack (S) register.
+  private int $regS;
 
   // Registers A,X,Y.
   private int $regA;
@@ -41,9 +48,13 @@ class MPUChip {
    * Main program loop.
    *
    * @uses lda()
+   * @uses ldx()
+   * @uses txs()
    * @uses sta()
    * @uses ror()
    * @uses jmp()
+   * @uses jsr()
+   * @uses pha()
    * @throws \Exception
    */
   public function loop(): void {
@@ -52,6 +63,7 @@ class MPUChip {
       if (!array_key_exists($opCode, self::$opMatrix)) {
         throw new \Exception('Unknown OpCode ' . Util::byteHex($opCode));
       }
+      // @todo handle different addressing modes
       $function = self::$opMatrix[$opCode];
       $this->$function();
     }
@@ -60,6 +72,15 @@ class MPUChip {
 
   private function lda(): void {
     $this->regA = $this->readByte();
+  }
+
+  private function ldx(): void {
+    $this->regX = $this->readByte();
+  }
+
+  private function txs(): void {
+    // Stack starts at 0x0100
+    $this->regS = 256 + $this->regX;
   }
 
   private function sta(): void {
@@ -73,6 +94,30 @@ class MPUChip {
 
   private function jmp(): void {
     $this->regPC = $this->readAddress();
+  }
+
+  /**
+   * 0x20 - Jump to SubRoutine.
+   */
+  private function jsr(): void {
+    $return_address = $this->regPC + 2;
+    $addressHi = (int) floor($return_address / 256);
+    $addressLo = $return_address - $addressHi * 256;
+    $this->write($this->regS, $addressHi);
+    $this->regS--;
+    $this->write($this->regS, $addressLo);
+    $this->regS--;
+    $this->regPC = $this->readAddress();
+  }
+
+  /**
+   * 0x48 - PusH Accumulator on stack.
+   *
+   * @return int
+   */
+  private function pha(): void {
+    $this->write($this->regS, $this->regA);
+    $this->regS--;
   }
 
   private function readByte(): int {
@@ -98,8 +143,7 @@ class MPUChip {
       $this->dataBus->write($address, $data);
     }
     catch (\Exception $exception) {
-      echo 'Could not write: ' . $exception->getMessage() . "\n";
-      exit;
+      throw new \Exception('Could not write: ' . $exception->getMessage());
     }
   }
 

@@ -9,7 +9,9 @@ use Danepowell\dp6502\Util;
 class VIAChip extends AbstractChip {
   private array $data;
   private int $ddrb;
+  private int $ddra;
   private int $orb;
+  private int $ora;
   private LEDs $portb;
 
   public function __construct($portb) {
@@ -24,11 +26,18 @@ class VIAChip extends AbstractChip {
         $this->orb = $data;
         $this->portb->write($data);
         break;
+      case 1:
+        $this->ora = $data;
+        // @todo wire this to LCD
+        break;
       case 2:
         $this->ddrb = $data;
         break;
+      case 3:
+        $this->ddra = $data;
+        break;
       default:
-        throw new \Exception('Unknown register number');
+        throw new \Exception('Unknown VIA register number ' . $address);
     }
     $this->data[$address] = $data;
   }

@@ -20,5 +20,11 @@ try {
   $mpu->reset();
 }
 catch (\Exception $exception) {
-  echo 'Program execution error: ' . $exception->getMessage() . "\n";
+    $message = 'Program execution error: ' . $exception->getMessage();
+    if (getenv('DP6502_DEBUG')) {
+        throw new \Exception($message);
+    }
+    else {
+      echo $message . "\n";
+    }
 }
