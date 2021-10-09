@@ -1,4 +1,6 @@
+// A15 - A0
 const char ADDR[] = {52, 50, 48, 46, 44, 42, 40, 38, 36, 34, 32, 30, 28, 26, 24, 22};
+// D7 - D0
 const char DATA[] = {45, 43, 41, 39, 37, 35, 33, 31};
 #define CLOCK 2
 #define READ_WRITE 3
