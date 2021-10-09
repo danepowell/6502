@@ -42,7 +42,8 @@ print:
 loop:
   jmp loop
 
-message: .asciiz "   Learn more                           eater.net/6502"
+message: .asciiz " Hello, World!"
+; message: .asciiz "   Learn more                           eater.net/6502"
 
 lcd_wait:
   pha
