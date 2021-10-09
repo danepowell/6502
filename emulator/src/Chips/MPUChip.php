@@ -4,6 +4,7 @@ namespace Danepowell\dp6502\Chips;
 
 use Danepowell\dp6502\DataBus;
 use Danepowell\dp6502\Util;
+use Exception;
 
 /**
  * Emulate a 6502 MPUChip.
@@ -12,14 +13,15 @@ class MPUChip {
 
   private DataBus $dataBus;
   private static array $opMatrix = [
-    0xa9 => 'lda',
-    0x8d => 'sta',
-    0x6a => 'ror',
-    0x4c => 'jmp',
-    0xa2 => 'ldx',
-    0x9a => 'txs',
-    0x20 => 'jsr',
-    0x48 => 'pha',
+    0xa9 => ['lda', '#'],
+    0xad => ['lda', 'a'],
+    0x8d => ['sta', 'a'],
+    0x6a => ['ror', 'A'],
+    0x4c => ['jmp', 'a'],
+    0xa2 => ['ldx', '#'],
+    0x9a => ['txs', 'i'],
+    0x20 => ['jsr', 'a'],
+    0x48 => ['pha', 's'],
   ];
 
   // Program counter (PC) register.
@@ -40,7 +42,7 @@ class MPUChip {
   public function reset(): void {
     // Get the reset vector.
     $this->regPC = 0xfffc;
-    $this->jmp();
+    $this->jmp($this->readAddress());
     $this->loop();
   }
 
@@ -61,45 +63,67 @@ class MPUChip {
     do {
       $opCode = $this->readByte();
       if (!array_key_exists($opCode, self::$opMatrix)) {
-        throw new \Exception('Unknown OpCode ' . Util::byteHex($opCode));
+        throw new Exception('Unknown OpCode ' . Util::byteHex($opCode));
       }
-      // @todo handle different addressing modes
-      $function = self::$opMatrix[$opCode];
-      $this->$function();
+      $operand = null;
+      $instruction = self::$opMatrix[$opCode];
+      switch ($instruction[1]) {
+        case '#':
+          $operand = $this->readByte();
+          break;
+        case 'a':
+          $operand = $this->readAddress();
+          break;
+        case 'A':
+          $operand = $this->regA;
+          break;
+        case 's':
+          $operand = $this->regS;
+          break;
+        case 'i':
+          $operand = null;
+          break;
+      }
+      $function = $instruction[0];
+      $this->$function($operand);
     }
     while (TRUE);
   }
 
-  private function lda(): void {
-    $this->regA = $this->readByte();
+  private function lda(int $operand): void {
+    $this->regA = $operand;
   }
 
-  private function ldx(): void {
-    $this->regX = $this->readByte();
+  private function ldx(int $operand): void {
+    $this->regX = $operand;
   }
 
-  private function txs(): void {
+  private function txs($operand): void {
     // Stack starts at 0x0100
     $this->regS = 256 + $this->regX;
   }
 
-  private function sta(): void {
-    $this->write($this->readAddress(), $this->regA);
+  private function sta(int $operand): void {
+    $this->write($operand, $this->regA);
   }
 
-  private function ror(): void {
-    $binary = Util::decBin($this->regA, 8);
+  private function ror(int $operand): void {
+    $binary = Util::decBin($operand, 8);
     $this->regA = bindec(substr($binary, -1).substr($binary, 0, -1));
   }
 
-  private function jmp(): void {
-    $this->regPC = $this->readAddress();
+  private function jmp(int $operand): void {
+    $this->regPC = $operand;
   }
 
   /**
-   * 0x20 - Jump to SubRoutine.
+   * Jump to SubRoutine.
+   *
+   * @param int $operand
+   *
+   * @throws \Exception
    */
-  private function jsr(): void {
+  private function jsr(int $operand): void {
     $return_address = $this->regPC + 2;
     $addressHi = (int) floor($return_address / 256);
     $addressLo = $return_address - $addressHi * 256;
@@ -107,16 +131,19 @@ class MPUChip {
     $this->regS--;
     $this->write($this->regS, $addressLo);
     $this->regS--;
-    $this->regPC = $this->readAddress();
+    $this->regPC = $operand;
   }
 
   /**
-   * 0x48 - PusH Accumulator on stack.
+   * PusH Accumulator on stack.
    *
-   * @return int
+   * @param int $operand
+   *
+   * @return void
+   * @throws \Exception
    */
-  private function pha(): void {
-    $this->write($this->regS, $this->regA);
+  private function pha(int $operand): void {
+    $this->write($operand, $this->regA);
     $this->regS--;
   }
 
@@ -135,6 +162,12 @@ class MPUChip {
     return $addressHi * 256 + $addressLo;
   }
 
+  /**
+   * @param int $address
+   * @param int $data
+   *
+   * @throws \Exception
+   */
   private function write(int $address, int $data): void {
     if (getenv('DP6502_DEBUG')) {
       echo 'Write ' . Util::addressHex($address) . ': ' . Util::byteHex($data) . "\n";
@@ -142,8 +175,8 @@ class MPUChip {
     try {
       $this->dataBus->write($address, $data);
     }
-    catch (\Exception $exception) {
-      throw new \Exception('Could not write: ' . $exception->getMessage());
+    catch (Exception $exception) {
+      throw new Exception('Could not write: ' . $exception->getMessage());
     }
   }
 
