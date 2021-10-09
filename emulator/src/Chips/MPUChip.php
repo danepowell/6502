@@ -150,6 +150,7 @@ class MPUChip {
   private function readByte(): int {
     $data = $this->dataBus->read($this->regPC);
     if (getenv('DP6502_DEBUG')) {
+      // @todo PHPUnit test to verify output
       echo 'Read ' . Util::addressHex($this->regPC) . ': ' . Util::byteHex($data) . "\n";
     }
     $this->regPC++;
