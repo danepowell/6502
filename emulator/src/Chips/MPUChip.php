@@ -69,11 +69,16 @@ class MPUChip {
       }
       $operand = null;
       $instruction = self::$opMatrix[$opCode];
+      $function = $instruction[0];
       switch ($instruction[1]) {
         case '#':
           $operand = $this->readByte();
           break;
         case 'a':
+          if ($function === 'jsr') {
+            $operand = $this->readByte();
+            break;
+          }
           $operand = $this->readAddress();
           break;
         case 'A':
@@ -86,7 +91,6 @@ class MPUChip {
           $operand = null;
           break;
       }
-      $function = $instruction[0];
       $this->$function($operand);
       if ($operand === null) {
         $this->readByte();
@@ -126,20 +130,22 @@ class MPUChip {
    * Jump to SubRoutine.
    *
    * @param int $operand
+   *   First byte of address.
    *
    * @throws \Exception
    */
   private function jsr(int $operand): void {
-    $return_address = $this->regPC + 2;
+    $return_address = $this->regPC;
     $addressHi = (int) floor($return_address / 256);
     $addressLo = $return_address - $addressHi * 256;
     // @todo this isn't quite right, it looks like jsr actually only reads half of the address operand before reading the stack?
-    $this->readByte($this->regS);
+    $this->readByte($this->regS, $addressHi);
     $this->write($this->regS, $addressHi);
     $this->regS--;
     $this->write($this->regS, $addressLo);
     $this->regS--;
-    $this->regPC = $operand;
+    $this->regPC--;
+    $this->regPC = $operand * 256 + $this->readByte();
   }
 
   /**
@@ -155,12 +161,16 @@ class MPUChip {
     $this->regS--;
   }
 
-  private function readByte(int $address = null): int {
+  private function readByte(int $address = null, int $force = null): int {
     $address = $address ?: $this->regPC;
     $data = $this->dataBus->read($address);
+    if ($force) {
+      // This is so dumb. For some instructions, it seems like the 6502 puts bits on the data bus without actually writing?
+      $data = $force;
+    }
     if (getenv('DP6502_DEBUG')) {
       // @todo PHPUnit test to verify output
-      echo 'Read ' . Util::addressHex($this->regPC) . ': ' . Util::byteHex($data) . "\n";
+      echo 'Read ' . Util::addressHex($address) . ': ' . Util::byteHex($data) . "\n";
     }
     $this->regPC++;
     $this->cycles++;
