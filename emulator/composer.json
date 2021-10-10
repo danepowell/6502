@@ -7,6 +7,11 @@
             "Danepowell\\dp6502\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Danepowell\\dp6502\\Tests\\": "tests/src/"
+        }
+    },
     "authors": [
         {
             "name": "Dane Powell",
@@ -18,7 +23,8 @@
     },
     "require-dev": {
         "acquia/coding-standards": "^0.7.0",
-        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1"
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
+        "phpunit/phpunit": "^9.5"
     },
     "extra": {
         "phpcodesniffer-search-depth": "4"

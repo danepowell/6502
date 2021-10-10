@@ -12,6 +12,7 @@ use Exception;
 class MPUChip {
 
   private DataBus $dataBus;
+  private int $cycles;
   private static array $opMatrix = [
     0xa9 => ['lda', '#'],
     0xad => ['lda', 'a'],
@@ -39,11 +40,12 @@ class MPUChip {
     $this->dataBus = $dataBus;
   }
 
-  public function reset(): void {
+  public function reset(int $maxCycles): void {
     // Get the reset vector.
     $this->regPC = 0xfffc;
+    $this->cycles = 1;
     $this->jmp($this->readAddress());
-    $this->loop();
+    $this->loop($maxCycles);
   }
 
   /**
@@ -59,7 +61,7 @@ class MPUChip {
    * @uses pha()
    * @throws \Exception
    */
-  public function loop(): void {
+  public function loop(int $maxCycles): void {
     do {
       $opCode = $this->readByte();
       if (!array_key_exists($opCode, self::$opMatrix)) {
@@ -86,8 +88,12 @@ class MPUChip {
       }
       $function = $instruction[0];
       $this->$function($operand);
+      if ($operand === null) {
+        $this->readByte();
+        $this->regPC--;
+      }
     }
-    while (TRUE);
+    while ($this->cycles < $maxCycles);
   }
 
   private function lda(int $operand): void {
@@ -154,6 +160,7 @@ class MPUChip {
       echo 'Read ' . Util::addressHex($this->regPC) . ': ' . Util::byteHex($data) . "\n";
     }
     $this->regPC++;
+    $this->cycles++;
     return $data;
   }
 
@@ -175,6 +182,7 @@ class MPUChip {
     }
     try {
       $this->dataBus->write($address, $data);
+      $this->cycles++;
     }
     catch (Exception $exception) {
       throw new Exception('Could not write: ' . $exception->getMessage());

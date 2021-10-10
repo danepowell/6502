@@ -17,7 +17,7 @@ $dataBus = new DataBus([$rom, $ram, $via]);
 $mpu = new MPUChip($dataBus);
 
 try {
-  $mpu->reset();
+  $mpu->reset(1000);
 }
 catch (\Exception $exception) {
     $message = 'Program execution error: ' . $exception->getMessage();

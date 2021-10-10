@@ -7,7 +7,7 @@ These are the project files for my version of [Ben Eater's 6502 computer](https:
 - Install VSCode and Arduino IDE V2 (I couldn't get the online editor to work reliably with the serial interface)
 - Install MADS extension for nice assembly highlighting
 - Install VASM using [latest release binary](http://www.compilers.de/vasm.html)
-- `vasm6502_oldstyle -Fbin -dotdir blink.asm`
+- `vasm6502_oldstyle -Fbin -dotdir -o blink.out blink.asm`
 
 ## Future plans
 
