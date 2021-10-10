@@ -11,6 +11,10 @@ class RAMChip extends AbstractChip {
 
   private array $data;
 
+  public function __construct() {
+    $this->data = array_fill(0, $this->addressEnd() - $this->addressStart(), 0);
+  }
+
   public function read(int $address): int {
     Util::validateAddress($address);
     return $this->data[$address];

@@ -133,6 +133,8 @@ class MPUChip {
     $return_address = $this->regPC + 2;
     $addressHi = (int) floor($return_address / 256);
     $addressLo = $return_address - $addressHi * 256;
+    // @todo this isn't quite right, it looks like jsr actually only reads half of the address operand before reading the stack?
+    $this->readByte($this->regS);
     $this->write($this->regS, $addressHi);
     $this->regS--;
     $this->write($this->regS, $addressLo);
@@ -153,8 +155,9 @@ class MPUChip {
     $this->regS--;
   }
 
-  private function readByte(): int {
-    $data = $this->dataBus->read($this->regPC);
+  private function readByte(int $address = null): int {
+    $address = $address ?: $this->regPC;
+    $data = $this->dataBus->read($address);
     if (getenv('DP6502_DEBUG')) {
       // @todo PHPUnit test to verify output
       echo 'Read ' . Util::addressHex($this->regPC) . ': ' . Util::byteHex($data) . "\n";
