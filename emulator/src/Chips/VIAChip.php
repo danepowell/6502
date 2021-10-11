@@ -43,7 +43,7 @@ class VIAChip extends AbstractChip {
   }
 
   public function read(int $address): int {
-    throw new \Exception('Read not implemented');
+    throw new \Exception('VIA read not implemented');
   }
 
   public function addressStart(): int {

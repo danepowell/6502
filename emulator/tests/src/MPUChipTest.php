@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class MPUChipTest extends TestCase {
   // Must be aligned to instruction.
-  private static int $maxCycles = 20;
+  private static int $maxCycles = 32;
 
   public function testHelloWorld(): void {
     $serial_output = file_get_contents(__DIR__ . '/../fixture/hello-world.serial');

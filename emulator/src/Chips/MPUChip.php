@@ -23,6 +23,7 @@ class MPUChip {
     0x9a => ['txs', 'i'],
     0x20 => ['jsr', 'a'],
     0x48 => ['pha', 's'],
+    0x29 => ['and', '#'],
   ];
 
   // Program counter (PC) register.
@@ -59,13 +60,14 @@ class MPUChip {
    * @uses jmp()
    * @uses jsr()
    * @uses pha()
+   * @uses and()
    * @throws \Exception
    */
   public function loop(int $maxCycles): void {
     do {
       $opCode = $this->readByte();
       if (!array_key_exists($opCode, self::$opMatrix)) {
-        throw new Exception('Unknown OpCode ' . Util::byteHex($opCode));
+        throw new Exception('Unknown OpCode ' . Util::byteHex($opCode) . ' on cycle ' . $this->cycles);
       }
       $operand = null;
       $instruction = self::$opMatrix[$opCode];
@@ -126,6 +128,10 @@ class MPUChip {
     $this->regPC = $operand;
   }
 
+  private function and(int $operand): void {
+    $this->regA = $this->regA & $operand;
+  }
+
   /**
    * Jump to SubRoutine.
    *
@@ -145,7 +151,7 @@ class MPUChip {
     $this->write($this->regS, $addressLo);
     $this->regS--;
     $this->regPC--;
-    $this->regPC = $operand * 256 + $this->readByte();
+    $this->regPC = $this->readByte() * 256 + $operand;
   }
 
   /**
@@ -163,7 +169,12 @@ class MPUChip {
 
   private function readByte(int $address = null, int $force = null): int {
     $address = $address ?: $this->regPC;
-    $data = $this->dataBus->read($address);
+    try {
+      $data = $this->dataBus->read($address);
+    }
+    catch (Exception $e) {
+      throw new Exception("Could not read on cycle " . $this->cycles . ": " . $e->getMessage());
+    }
     if ($force) {
       // This is so dumb. For some instructions, it seems like the 6502 puts bits on the data bus without actually writing?
       $data = $force;
