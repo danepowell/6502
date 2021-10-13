@@ -144,7 +144,6 @@ class MPUChip {
     $return_address = $this->regPC;
     $addressHi = (int) floor($return_address / 256);
     $addressLo = $return_address - $addressHi * 256;
-    // @todo this isn't quite right, it looks like jsr actually only reads half of the address operand before reading the stack?
     $this->readByte($this->regS, $addressHi);
     $this->write($this->regS, $addressHi);
     $this->regS--;
@@ -163,6 +162,8 @@ class MPUChip {
    * @throws \Exception
    */
   private function pha(int $operand): void {
+    $this->readByte($this->regPC);
+    $this->regPC--;
     $this->write($operand, $this->regA);
     $this->regS--;
   }
