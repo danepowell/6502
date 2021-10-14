@@ -17,11 +17,11 @@ $dataBus = new DataBus([$rom, $ram, $via]);
 $mpu = new MPUChip($dataBus);
 
 try {
-  $mpu->reset(1000);
+  $mpu->reset(53);
 }
 catch (\Exception $exception) {
     $message = 'Program execution error: ' . $exception->getMessage();
-    if (getenv('DP6502_DEBUG')) {
+    if (getenv('DP6502_OUTPUT')) {
         throw new \Exception($message);
     }
     else {

@@ -65,14 +65,13 @@ class MPUChip {
    */
   public function loop(int $maxCycles): void {
     do {
-      $opCode = $this->readByte();
+      $opCode = $this->readByte(null, null, true);
       if (!array_key_exists($opCode, self::$opMatrix)) {
         throw new Exception('Unknown OpCode ' . Util::byteHex($opCode) . ' on cycle ' . $this->cycles);
       }
       $operand = null;
-      $instruction = self::$opMatrix[$opCode];
-      $function = $instruction[0];
-      switch ($instruction[1]) {
+      list($function, $addressMode) = self::$opMatrix[$opCode];
+      switch ($addressMode) {
         case '#':
           $operand = $this->readByte();
           break;
@@ -93,7 +92,7 @@ class MPUChip {
           $operand = null;
           break;
       }
-      $this->$function($operand);
+      $this->$function($operand, $addressMode);
       if ($operand === null) {
         $this->readByte();
         $this->regPC--;
@@ -102,33 +101,36 @@ class MPUChip {
     while ($this->cycles < $maxCycles);
   }
 
-  private function lda(int $operand): void {
+  private function lda(int $operand, string $addressMode = null): void {
+    if ($addressMode === 'a') {
+      $operand = $this->readByte($operand);
+    }
     $this->regA = $operand;
   }
 
-  private function ldx(int $operand): void {
+  private function ldx(int $operand, string $addressMode = null): void {
     $this->regX = $operand;
   }
 
-  private function txs($operand): void {
+  private function txs($operand, string $addressMode = null): void {
     // Stack starts at 0x0100
     $this->regS = 256 + $this->regX;
   }
 
-  private function sta(int $operand): void {
+  private function sta(int $operand, string $addressMode = null): void {
     $this->write($operand, $this->regA);
   }
 
-  private function ror(int $operand): void {
+  private function ror(int $operand, string $addressMode = null): void {
     $binary = Util::decBin($operand, 8);
     $this->regA = bindec(substr($binary, -1).substr($binary, 0, -1));
   }
 
-  private function jmp(int $operand): void {
+  private function jmp(int $operand, string $addressMode = null): void {
     $this->regPC = $operand;
   }
 
-  private function and(int $operand): void {
+  private function and(int $operand, string $addressMode = null): void {
     $this->regA = $this->regA & $operand;
   }
 
@@ -140,7 +142,7 @@ class MPUChip {
    *
    * @throws \Exception
    */
-  private function jsr(int $operand): void {
+  private function jsr(int $operand, string $addressMode = null): void {
     $return_address = $this->regPC;
     $addressHi = (int) floor($return_address / 256);
     $addressLo = $return_address - $addressHi * 256;
@@ -161,14 +163,14 @@ class MPUChip {
    * @return void
    * @throws \Exception
    */
-  private function pha(int $operand): void {
+  private function pha(int $operand, string $addressMode = null): void {
     $this->readByte($this->regPC);
     $this->regPC--;
     $this->write($operand, $this->regA);
     $this->regS--;
   }
 
-  private function readByte(int $address = null, int $force = null): int {
+  private function readByte(int $address = null, int $force = null, bool $isOpCode = false): int {
     $address = $address ?: $this->regPC;
     try {
       $data = $this->dataBus->read($address);
@@ -180,9 +182,16 @@ class MPUChip {
       // This is so dumb. For some instructions, it seems like the 6502 puts bits on the data bus without actually writing?
       $data = $force;
     }
-    if (getenv('DP6502_DEBUG')) {
-      // @todo PHPUnit test to verify output
-      echo 'Read ' . Util::addressHex($address) . ': ' . Util::byteHex($data) . "\n";
+    if (getenv('DP6502_OUTPUT')) {
+      if (getenv('DP6502_DEBUG')) {
+        echo 'Cycle ' . $this->cycles . ': ';
+      }
+      echo 'Read ' . Util::addressHex($address) . ': ' . Util::byteHex($data);
+      if (getenv('DP6502_DEBUG') && $isOpCode) {
+        list($function, $addressMode) = self::$opMatrix[$data];
+        echo ' ' . strtoupper($function) . ' ' . $addressMode;
+      }
+      echo "\n";
     }
     $this->regPC++;
     $this->cycles++;
@@ -202,7 +211,10 @@ class MPUChip {
    * @throws \Exception
    */
   private function write(int $address, int $data): void {
-    if (getenv('DP6502_DEBUG')) {
+    if (getenv('DP6502_OUTPUT')) {
+      if (getenv('DP6502_DEBUG')) {
+        echo 'Cycle ' . $this->cycles . ': ';
+      }
       echo 'Write ' . Util::addressHex($address) . ': ' . Util::byteHex($data) . "\n";
     }
     try {
