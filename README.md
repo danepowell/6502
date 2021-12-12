@@ -18,6 +18,8 @@ These are the project files for my version of [Ben Eater's 6502 computer](https:
 - [Turn into a PCB](https://www.reddit.com/r/beneater/comments/dgcpt3/i_made_a_pcb_version_of_ben_eaters_6502_computer/)
 - Emulator: starting in PHP, or [following example](https://www.reddit.com/r/beneater/comments/phn3sd/started_work_on_an_emulator_for_my_6502_tms9918/)
 - Space Invaders ([source code](https://github.com/visrealm/hbc-56/tree/master/code/6502/invaders))
+- Raycaster (e.g. Wolfenstein)
+- [cc65 integration](https://www.reddit.com/r/beneater/comments/kn52w3/using_cc65_to_write_code_in_c_for_the_6502/?utm_medium=android_app&utm_source=share)
 
 ## Resources / credits
 
